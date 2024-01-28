@@ -1,7 +1,12 @@
 package cn.syw.springframework.beans.factory.support;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.syw.springframework.beans.BeansException;
+import cn.syw.springframework.beans.PropertyValue;
+import cn.syw.springframework.beans.PropertyValues;
 import cn.syw.springframework.beans.factory.config.BeanDefinition;
+import cn.syw.springframework.beans.factory.config.BeanReference;
+
 import java.lang.reflect.Constructor;
 
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory{
@@ -11,12 +16,36 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
         try {
             bean = createBeanInstance(beanName,beanDefinition,args);
+            // 给 Bean 填充属性
+            applyPropertyValues(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
         addSingleton(beanName, bean);
         return bean;
     }
+
+protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+    try {
+        PropertyValues propertyValues = beanDefinition.getPropertyValues();
+        for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+
+            String name = propertyValue.getName();
+            Object value = propertyValue.getValue();
+
+            if (value instanceof BeanReference) {
+                // A 依赖 B，获取 B 的实例化
+                BeanReference beanReference = (BeanReference) value;
+                value = getBean(beanReference.getBeanName());
+            }
+            // 属性填充
+            BeanUtil.setFieldValue(bean, name, value);
+        }
+    } catch (Exception e) {
+        throw new BeansException("Error setting property values：" + beanName);
+    }
+}
+
     protected Object createBeanInstance(String beanName,BeanDefinition beanDefinition,Object[] args) {
         Constructor constructorToUse = null;
         Class<?> beanClass = beanDefinition.getBeanClass();
