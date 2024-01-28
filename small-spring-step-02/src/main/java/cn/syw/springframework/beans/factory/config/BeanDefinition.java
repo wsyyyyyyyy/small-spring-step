@@ -7,6 +7,7 @@ public class BeanDefinition {
     private Class beanClass;
     public BeanDefinition(Class bean) {
         this.beanClass = bean;
+        this.propertyValues = new PropertyValues();
     }
     public BeanDefinition(Class beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
