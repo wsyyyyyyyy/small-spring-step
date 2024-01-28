@@ -8,16 +8,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
-    Map<String, BeanDefinition> beanDefinitionHashMap = new ConcurrentHashMap<>();
     @Override
     public Object getBean(String name) throws BeansException{
+        return doGetBean(name,null);
+    }
+    @Override
+    public Object getBean(String name,Object... args) throws BeansException{
+        return doGetBean(name,args);
+    }
+    protected <T> T doGetBean(final String name,final Object[] args) {
         Object bean = getSingleton(name);
         if (bean != null) {
-            return bean;
+            return (T) bean;
         }
         BeanDefinition beanDefinition = getDefinition(name);
-        return createBean(name,beanDefinition);
+        return (T) createBean(name,beanDefinition,args);
     }
     protected abstract BeanDefinition getDefinition(String beanName) throws BeansException;
-    protected abstract Object createBean(String name,BeanDefinition beanDefinition);
+    protected abstract Object createBean(String name,BeanDefinition beanDefinition,Object[] args);
 }
