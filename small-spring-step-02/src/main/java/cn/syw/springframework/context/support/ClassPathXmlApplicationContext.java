@@ -1,4 +1,4 @@
-package cn.syw.springframework.beans.factory.support;
+package cn.syw.springframework.context.support;
 
 import cn.syw.springframework.beans.BeansException;
 import cn.syw.springframework.context.support.AbstractXmlApplicationContext;

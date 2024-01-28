@@ -2,16 +2,12 @@ package cn.syw.springframework.test.bean;
 
 import cn.syw.springframework.beans.PropertyValue;
 import cn.syw.springframework.beans.PropertyValues;
-import cn.syw.springframework.beans.factory.BeanFactory;
 import cn.syw.springframework.beans.factory.config.BeanDefinition;
 import cn.syw.springframework.beans.factory.config.BeanReference;
-import cn.syw.springframework.beans.factory.support.BeanDefinitionRegistry;
-import cn.syw.springframework.beans.factory.support.ClassPathXmlApplicationContext;
+import cn.syw.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.syw.springframework.beans.factory.support.DefaultListableBeanFactory;
 import cn.syw.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.junit.Test;
-
-import java.lang.reflect.Constructor;
 
 public class Test_BeanFactory {
     @Test
@@ -115,5 +111,22 @@ public class Test_BeanFactory {
         UserService userService = applicationContext.getBean("userService", UserService.class);
         String result = userService.queryUserInfo();
         System.out.println("测试结果：" + result);
+    }
+
+    @Test
+    public void test_xml_new() {
+        // 1.初始化 BeanFactory
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        // 2. 获取Bean对象调用方法
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+        String result = userService.queryUserInfo();
+        System.out.println("测试结果：" + result);
+    }
+
+    @Test
+    public void test_hook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("close！")));
     }
 }
